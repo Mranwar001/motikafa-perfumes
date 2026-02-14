@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { featuredProducts } from '../assets/productImages';
+import { featuredProducts } from '../assets/ProductImages';
 
 const FeaturedCarousel = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
