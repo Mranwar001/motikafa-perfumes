@@ -1,3 +1,4 @@
+// src/App.jsx
 import React, { useEffect } from 'react';
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
@@ -7,13 +8,13 @@ import ContactSection from './components/ContactSection';
 import Footer from './components/Footer';
 import ScrollReveal from './components/ScrollReveal';
 
-// Import product data
+// ✅ Corrected import (case-sensitive on Vercel)
 import {
   perfumeProducts,
   fabricProducts,
   accessoryProducts,
   homeGoodsProducts,
-} from './assets/ProductImages';
+} from './assets/ProductImages.jsx';
 
 function App() {
   useEffect(() => {
