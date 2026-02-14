@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { heroImages } from '../assets/productImages';
+import { heroImages } from '../assets/ProductImages';
 
 const Hero = () => {
   const [currentImage, setCurrentImage] = useState(0);
