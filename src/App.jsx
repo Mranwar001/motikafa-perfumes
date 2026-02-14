@@ -13,7 +13,7 @@ import {
   fabricProducts,
   accessoryProducts,
   homeGoodsProducts,
-} from './assets/productImages';
+} from './assets/ProductImages';
 
 function App() {
   useEffect(() => {
