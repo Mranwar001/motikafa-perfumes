@@ -1,320 +1,169 @@
-// src/components/OrderModal.jsx
-import React, { useEffect, useState } from 'react';
+// src/App.jsx
+import React, { useState, useEffect } from 'react';
+import Navbar from './components/Navbar';
+import Hero from './components/Hero';
+import ProductCategory from './components/ProductCategory';
+import FeaturedCarousel from './components/FeaturedCarousel';
+import ContactSection from './components/ContactSection';
+import Footer from './components/Footer';
+import ScrollReveal from './components/ScrollReveal';
+import OrderModal from './components/OrderModal';
 
-const OrderModal = ({ product, onClose }) => {
-  const [copied, setCopied] = useState(false);
-  const [selectedMethod, setSelectedMethod] = useState(null);
+// Import product data
+import {
+  perfumeProducts,
+  fabricProducts,
+  accessoryProducts,
+  homeGoodsProducts,
+} from './assets/ProductImages';
+
+function App() {
+  const [orderProduct, setOrderProduct] = useState(null);
+  const [isOrderModalOpen, setIsOrderModalOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Prevent body scroll when modal is open
-    document.body.style.overflow = 'hidden';
+    // Simulate loading
+    setTimeout(() => setLoading(false), 1000);
     
-    // Close on escape key
-    const handleEscape = (e) => {
-      if (e.key === 'Escape') onClose();
-    };
-    window.addEventListener('keydown', handleEscape);
+    // Initialize scroll reveal
+    const revealElements = document.querySelectorAll('.scroll-reveal');
+    revealElements.forEach((el) => el.classList.remove('revealed'));
+    
+    // Add smooth scroll behavior
+    document.documentElement.style.scrollBehavior = 'smooth';
     
     return () => {
-      document.body.style.overflow = 'auto';
-      window.removeEventListener('keydown', handleEscape);
+      document.documentElement.style.scrollBehavior = 'auto';
     };
-  }, [onClose]);
+  }, []);
 
-  if (!product) return null;
-
-  const handleCopy = async () => {
-    const details = `🛍️ *MOTIKAFA Order Details* 🛍️\n\n` +
-      `Product: ${product.name}\n` +
-      `Price: ${product.price}\n` +
-      `Category: ${product.category}\n` +
-      `${product.originalPrice ? `Original: ${product.originalPrice}\n` : ''}` +
-      `${product.description ? `Description: ${product.description}\n` : ''}\n` +
-      `📞 Contact: +234 809 393 9396\n` +
-      `📧 Email: orders@motikafa.com`;
-    
-    try {
-      await navigator.clipboard.writeText(details);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    } catch (err) {
-      console.error('Failed to copy:', err);
-    }
+  // Handle order from any component
+  const handleOrderClick = (product) => {
+    console.log('Order clicked:', product); // Debug log
+    setOrderProduct(product);
+    setIsOrderModalOpen(true);
   };
 
-  const contactMethods = [
-    {
-      id: 'whatsapp',
-      name: 'WhatsApp',
-      icon: 'fab fa-whatsapp',
-      color: 'bg-green-500 hover:bg-green-600',
-      description: 'Quick response within minutes',
-      action: () => {
-        const message = encodeURIComponent(
-          `🛍️ *New Order Inquiry - MOTIKAFA* 🛍️\n\n` +
-          `*Product:* ${product.name}\n` +
-          `*Price:* ${product.price}\n` +
-          `*Category:* ${product.category}\n` +
-          `${product.originalPrice ? `*Original:* ${product.originalPrice}\n` : ''}\n` +
-          `Please provide payment options and delivery details.`
-        );
-        window.open(`https://wa.me/2348093939396?text=${message}`, '_blank');
-        onClose(); // Close modal after action
-      }
-    },
-    {
-      id: 'email',
-      name: 'Email',
-      icon: 'far fa-envelope',
-      color: 'bg-blue-500 hover:bg-blue-600',
-      description: 'Send detailed inquiry',
-      action: () => {
-        const subject = encodeURIComponent(`Order Inquiry: ${product.name}`);
-        const body = encodeURIComponent(
-          `I would like to order:\n\n` +
-          `Product: ${product.name}\n` +
-          `Price: ${product.price}\n` +
-          `Category: ${product.category}\n` +
-          `${product.description ? `Description: ${product.description}\n` : ''}\n` +
-          `Please provide:\n` +
-          `- Payment options (Bank Transfer/Card)\n` +
-          `- Delivery fees to my location\n` +
-          `- Available sizes/colors/variations\n\n` +
-          `Thank you!`
-        );
-        window.location.href = `mailto:orders@motikafa.com?subject=${subject}&body=${body}`;
-        onClose();
-      }
-    },
-    {
-      id: 'phone',
-      name: 'Phone Call',
-      icon: 'fas fa-phone-alt',
-      color: 'bg-purple-500 hover:bg-purple-600',
-      description: 'Speak with our concierge',
-      action: () => {
-        window.location.href = 'tel:+2348093939396';
-        onClose();
-      }
-    },
-    {
-      id: 'copy',
-      name: copied ? 'Copied!' : 'Copy Details',
-      icon: copied ? 'fas fa-check' : 'far fa-copy',
-      color: copied ? 'bg-green-500 hover:bg-green-600' : 'bg-[#1A1A1A] hover:bg-[#333333]',
-      description: copied ? 'Details copied to clipboard' : 'Copy product info',
-      action: handleCopy
-    }
-  ];
+  // Close modal
+  const handleCloseModal = () => {
+    setIsOrderModalOpen(false);
+    setOrderProduct(null);
+  };
 
-  // Additional quick actions
-  const quickActions = [
-    {
-      name: 'Request Sample',
-      icon: 'fas fa-flask',
-      action: () => {
-        const message = encodeURIComponent(
-          `Hi! I'd like to request a sample of ${product.name} before ordering.`
-        );
-        window.open(`https://wa.me/2348093939396?text=${message}`, '_blank');
-      }
-    },
-    {
-      name: 'Check Availability',
-      icon: 'fas fa-check-circle',
-      action: () => {
-        const message = encodeURIComponent(
-          `Is ${product.name} currently in stock? I'm interested in purchasing.`
-        );
-        window.open(`https://wa.me/2348093939396?text=${message}`, '_blank');
-      }
-    },
-    {
-      name: 'Wholesale Price',
-      icon: 'fas fa-tags',
-      action: () => {
-        const message = encodeURIComponent(
-          `I'm interested in wholesale pricing for ${product.name}. Please share bulk rates.`
-        );
-        window.open(`https://wa.me/2348093939396?text=${message}`, '_blank');
-      }
-    }
-  ];
-
-  return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-      {/* Backdrop */}
-      <div 
-        className="absolute inset-0 bg-black/60 backdrop-blur-sm"
-        onClick={onClose}
-      />
-      
-      {/* Modal */}
-      <div className="relative bg-white rounded-2xl max-w-lg w-full shadow-2xl animate-slideUp overflow-hidden">
-        {/* Gold Accent Line */}
-        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#D4AF37] via-[#F5E6B2] to-[#D4AF37]"></div>
-
-        {/* Header */}
-        <div className="p-6 border-b border-gray-100">
-          <div className="flex items-center justify-between">
-            <div>
-              <h3 className="font-['Cormorant_Garamond'] text-2xl font-bold text-[#1A1A1A] flex items-center">
-                <i className="fas fa-crown text-[#D4AF37] mr-2 text-xl"></i>
-                Complete Your Order
-              </h3>
-              <p className="text-sm text-gray-500 mt-1">
-                Choose your preferred contact method
-              </p>
-            </div>
-            <button
-              onClick={onClose}
-              className="w-10 h-10 rounded-full hover:bg-gray-100 flex items-center justify-center transition-colors"
-              aria-label="Close modal"
-            >
-              <i className="fas fa-times text-gray-500"></i>
-            </button>
-          </div>
-        </div>
-
-        {/* Product Preview */}
-        <div className="p-6 bg-gradient-to-r from-[#FFF8E7] to-white">
-          <div className="flex items-center space-x-4">
-            {/* Product Image with Badge */}
-            <div className="relative">
-              <div className="w-20 h-20 rounded-lg overflow-hidden bg-gray-100 ring-2 ring-[#D4AF37]/20">
-                <img 
-                  src={product.images?.[0] || product.image} 
-                  alt={product.name}
-                  className="w-full h-full object-cover"
-                />
-              </div>
-              {product.badge && (
-                <span className="absolute -top-2 -right-2 bg-[#D4AF37] text-[#1A1A1A] text-[10px] font-bold px-2 py-1 rounded-full">
-                  {product.badge}
-                </span>
-              )}
-            </div>
-            
-            {/* Product Details */}
-            <div className="flex-1">
-              <h4 className="font-['Cormorant_Garamond'] text-lg font-bold text-[#1A1A1A]">
-                {product.name}
-              </h4>
-              <p className="text-sm text-[#8B0000] mb-1">{product.category}</p>
-              <div className="flex items-center space-x-2">
-                <span className="text-xl font-bold text-[#8B0000]">{product.price}</span>
-                {product.originalPrice && (
-                  <span className="text-sm text-gray-400 line-through">{product.originalPrice}</span>
-                )}
-              </div>
-              {/* Rating */}
-              {product.rating && (
-                <div className="flex items-center mt-1">
-                  {[...Array(5)].map((_, i) => (
-                    <i
-                      key={i}
-                      className={`fas fa-star text-xs ${
-                        i < product.rating ? 'text-[#D4AF37]' : 'text-gray-200'
-                      }`}
-                    ></i>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-
-        {/* Contact Options */}
-        <div className="p-6 space-y-3">
-          <p className="text-sm font-medium text-gray-700 mb-4 flex items-center">
-            <i className="fas fa-phone-alt mr-2 text-[#D4AF37]"></i>
-            Select contact method:
-          </p>
-          
-          {contactMethods.map((method) => (
-            <button
-              key={method.id}
-              onClick={method.action}
-              onMouseEnter={() => setSelectedMethod(method.id)}
-              onMouseLeave={() => setSelectedMethod(null)}
-              className={`w-full p-4 bg-gray-50 hover:bg-gray-100 rounded-xl transition-all duration-300 flex items-center space-x-4 group ${
-                selectedMethod === method.id ? 'ring-2 ring-[#D4AF37]' : ''
-              }`}
-            >
-              <div className={`w-12 h-12 ${method.color} rounded-full flex items-center justify-center text-white text-xl transition-all duration-300 group-hover:scale-110 group-hover:shadow-lg`}>
-                <i className={method.icon}></i>
-              </div>
-              <div className="flex-1 text-left">
-                <p className="font-semibold text-[#1A1A1A]">{method.name}</p>
-                <p className="text-xs text-gray-500">{method.description}</p>
-              </div>
-              <div className="text-right">
-                <i className="fas fa-chevron-right text-gray-400 group-hover:text-[#D4AF37] transition-colors"></i>
-              </div>
-            </button>
-          ))}
-        </div>
-
-        {/* Quick Actions */}
-        <div className="px-6 pb-6">
-          <p className="text-xs text-gray-500 mb-3">Quick actions:</p>
-          <div className="flex flex-wrap gap-2">
-            {quickActions.map((action) => (
-              <button
-                key={action.name}
-                onClick={action.action}
-                className="px-4 py-2 bg-gray-50 hover:bg-[#D4AF37] text-[#4A4A4A] hover:text-[#1A1A1A] rounded-lg text-xs transition-all duration-300 flex items-center space-x-1 group"
-              >
-                <i className={`${action.icon} group-hover:scale-110 transition-transform`}></i>
-                <span>{action.name}</span>
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Footer with Trust Badges */}
-        <div className="p-4 bg-gradient-to-r from-gray-50 to-white border-t border-gray-100">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <div className="flex items-center space-x-1">
-                <i className="fas fa-shield-alt text-[#D4AF37] text-xs"></i>
-                <span className="text-xs text-gray-500">Secure</span>
-              </div>
-              <div className="flex items-center space-x-1">
-                <i className="fas fa-truck text-[#D4AF37] text-xs"></i>
-                <span className="text-xs text-gray-500">Fast Delivery</span>
-              </div>
-              <div className="flex items-center space-x-1">
-                <i className="fas fa-undo-alt text-[#D4AF37] text-xs"></i>
-                <span className="text-xs text-gray-500">Easy Returns</span>
-              </div>
-            </div>
-            <p className="text-xs text-gray-400">
-              <i className="far fa-clock mr-1 text-[#D4AF37]"></i>
-              24h response
-            </p>
-          </div>
+  if (loading) {
+    return (
+      <div className="fixed inset-0 bg-[#FDF9F2] flex items-center justify-center z-50">
+        <div className="text-center">
+          <div className="w-20 h-20 border-4 border-[#D4AF37]/20 border-t-[#D4AF37] rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-[#1A1A1A] font-['Cormorant_Garamond'] text-xl">MOTIKAFA</p>
+          <p className="text-[#D4AF37] text-sm">Luxury Loading...</p>
         </div>
       </div>
+    );
+  }
 
-      {/* Animation Styles */}
-      <style jsx>{`
-        @keyframes slideUp {
-          from {
-            opacity: 0;
-            transform: translateY(20px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-        .animate-slideUp {
-          animation: slideUp 0.3s ease-out;
-        }
-      `}</style>
-    </div>
+  return (
+    <ScrollReveal>
+      <div className="relative min-h-screen bg-gradient-to-b from-[#FDF9F2] to-white">
+        {/* Pass handleOrderClick to Navbar */}
+        <Navbar onOrderClick={handleOrderClick} />
+        
+        {/* Pass handleOrderClick to Hero */}
+        <Hero onOrderClick={handleOrderClick} />
+        
+        {/* Decorative divider */}
+        <div className="relative">
+          <div className="absolute inset-0 flex items-center justify-center -top-6">
+            <div className="w-24 h-24 bg-[#D4AF37]/5 rounded-full blur-3xl"></div>
+          </div>
+        </div>
+        
+        {/* Perfumes Section */}
+        <ProductCategory
+          id="perfumes"
+          title="Arabian Perfumes"
+          subtitle="SIGNATURE COLLECTION"
+          products={perfumeProducts}
+          bgColor="bg-white"
+          onOrderClick={handleOrderClick}
+        />
+        
+        {/* Fabrics Section */}
+        <ProductCategory
+          id="fabrics"
+          title="Premium Fabrics"
+          subtitle="LUXURY TEXTILES"
+          products={fabricProducts}
+          bgColor="bg-[#FDF9F2]"
+          onOrderClick={handleOrderClick}
+        />
+        
+        {/* Featured Carousel */}
+        <FeaturedCarousel onOrderClick={handleOrderClick} />
+        
+        {/* Accessories Section */}
+        <ProductCategory
+          id="accessories"
+          title="Luxury Accessories"
+          subtitle="COMPLETE YOUR LOOK"
+          products={accessoryProducts}
+          bgColor="bg-white"
+          onOrderClick={handleOrderClick}
+        />
+        
+        {/* Home Goods Section */}
+        <ProductCategory
+          id="home-goods"
+          title="Home Collection"
+          subtitle="ELEVATE YOUR SPACE"
+          products={homeGoodsProducts}
+          bgColor="bg-[#FDF9F2]"
+          onOrderClick={handleOrderClick}
+        />
+        
+        {/* Contact Section */}
+        <ContactSection onOrderClick={handleOrderClick} />
+        
+        {/* Footer */}
+        <Footer onOrderClick={handleOrderClick} />
+
+        {/* Order Modal */}
+        {isOrderModalOpen && (
+          <OrderModal
+            product={orderProduct}
+            onClose={handleCloseModal}
+          />
+        )}
+
+        {/* Floating Action Button for mobile */}
+        <div className="fixed bottom-6 right-6 z-40 lg:hidden">
+          <button
+            onClick={() => handleOrderClick({ 
+              name: "Quick Assistance", 
+              price: "Contact for price",
+              category: "Customer Service"
+            })}
+            className="w-14 h-14 bg-[#D4AF37] hover:bg-[#1A1A1A] text-[#1A1A1A] hover:text-white rounded-full shadow-2xl flex items-center justify-center transition-all duration-300 transform hover:scale-110"
+            aria-label="Quick order"
+          >
+            <i className="fas fa-headset text-xl"></i>
+          </button>
+        </div>
+
+        {/* Back to top button */}
+        <div className="fixed bottom-6 left-6 z-40">
+          <button
+            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+            className="w-10 h-10 bg-white/80 backdrop-blur-sm hover:bg-[#D4AF37] text-[#1A1A1A] hover:text-white rounded-full shadow-lg flex items-center justify-center transition-all duration-300 border border-[#D4AF37]/20"
+            aria-label="Back to top"
+          >
+            <i className="fas fa-arrow-up"></i>
+          </button>
+        </div>
+      </div>
+    </ScrollReveal>
   );
-};
+}
 
-export default OrderModal;
+export default App;
