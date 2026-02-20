@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-const ProductCategory = ({ title, subtitle, products, id, bgColor = 'bg-white' }) => {
+const ProductCategory = ({ title, subtitle, products, id, bgColor = 'bg-white', onOrderClick }) => {
   const [imageIndex, setImageIndex] = useState({});
   const [showContactOptions, setShowContactOptions] = useState(null);
 
@@ -13,12 +13,18 @@ const ProductCategory = ({ title, subtitle, products, id, bgColor = 'bg-white' }
     setImageIndex(prev => ({ ...prev, [productId]: 0 }));
   };
 
-  // Handle contact options for order
+  // Handle order - use parent's onOrderClick if available, otherwise local dropdown
   const handleOrderClick = (product) => {
-    setShowContactOptions(showContactOptions === product.id ? null : product.id);
+    if (onOrderClick) {
+      // Use the global modal from App.jsx
+      onOrderClick(product);
+    } else {
+      // Fallback to local dropdown
+      setShowContactOptions(showContactOptions === product.id ? null : product.id);
+    }
   };
 
-  // Contact methods
+  // Contact methods (keep as fallback)
   const contactMethods = [
     {
       type: 'WhatsApp',
@@ -195,8 +201,8 @@ const ProductCategory = ({ title, subtitle, products, id, bgColor = 'bg-white' }
                         <span>Order Now</span>
                       </button>
 
-                      {/* Contact Options Dropdown */}
-                      {showContactOptions === product.id && (
+                      {/* Contact Options Dropdown - Only show if no parent onOrderClick */}
+                      {!onOrderClick && showContactOptions === product.id && (
                         <div className="absolute left-0 right-0 mt-2 bg-white rounded-lg shadow-xl border border-gray-100 overflow-hidden z-30 animate-fadeIn">
                           <div className="p-2">
                             <p className="text-xs text-gray-500 px-3 py-2">Choose contact method:</p>
